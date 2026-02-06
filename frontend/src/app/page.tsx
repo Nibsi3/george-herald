@@ -39,11 +39,12 @@ export default function Home() {
       <NewsTicker articles={tickerArticles} />
 
       <div className="container mx-auto px-4 py-6 lg:py-8">
+        <SectionHeader title="Top Stories" href="/news/top-stories" />
+
         {/* Hero + Sidebar */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
           {/* Hero section */}
           <div className="lg:col-span-2">
-            <SectionHeader title="Top Stories" href="/news/top-stories" />
             {heroArticle && <ArticleCardHero article={heroArticle} />}
 
             {/* Secondary stories grid */}
