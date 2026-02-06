@@ -54,13 +54,13 @@ export default function Home() {
             </div>
 
             {/* Award Feature - Large Showcase */}
-            <div className="mt-10">
+            <div className="mt-8">
               <Link
                 href="/news/george-herald-named-best-paid-community-newspaper-in-sa-avbob-fcj-excellence-awards-202508250122"
                 className="group block overflow-hidden rounded-2xl border-2 border-amber-300/50 bg-gradient-to-br from-amber-50 via-white to-amber-50 shadow-lg hover:shadow-xl transition-shadow"
               >
                 {/* Large hero image */}
-                <div className="relative w-full min-h-[260px] md:min-h-[360px]">
+                <div className="relative w-full min-h-[200px] md:min-h-[260px]">
                   <Image
                     src="https://cms.groupeditors.com/img/3c63f67c-14ca-4ee9-9f25-4d991056a6db.jpg?w=800&scale=both&quality=100"
                     alt="George Herald AVBOB FCJ Excellence Awards - Team photo"
@@ -78,7 +78,7 @@ export default function Home() {
                     </div>
                   </div>
                   {/* Title overlay on image */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+                  <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
                     <div className="flex flex-wrap items-center gap-2 mb-3">
                       <span className="text-[11px] font-bold uppercase tracking-widest text-amber-300 bg-black/40 px-3 py-1 rounded-full">
                         AVBOB FCJ Excellence Awards
@@ -87,20 +87,20 @@ export default function Home() {
                         2024 / 2025
                       </span>
                     </div>
-                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-black leading-tight text-white drop-shadow-lg">
+                    <h3 className="text-xl md:text-2xl lg:text-3xl font-black leading-tight text-white drop-shadow-lg">
                       George Herald named best paid community newspaper in South Africa
                     </h3>
                   </div>
                 </div>
 
                 {/* Content area below image */}
-                <div className="p-6 md:p-8">
-                  <p className="text-base md:text-lg text-foreground/80 leading-relaxed mb-4">
+                <div className="p-5 md:p-6">
+                  <p className="text-sm md:text-base text-foreground/80 leading-relaxed mb-4">
                     What a weekend! Group Editors returned home from the Avbob FCJ Excellence Awards with the most sought-after prizes for news coverage in 2024. George Herald came out tops, with all five Group Editors newspapers ranked among the top 10 nationwide.
                   </p>
 
                   {/* Key achievements grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+                  <div className="grid grid-cols-3 gap-3 mb-5">
                     <div className="bg-amber-50 border border-amber-200/60 rounded-xl p-4 text-center">
                       <div className="text-2xl font-black text-amber-600 mb-1">#1</div>
                       <div className="text-xs font-semibold text-amber-800">Best Paid Newspaper</div>
@@ -110,8 +110,8 @@ export default function Home() {
                       <div className="text-xs font-semibold text-amber-800">Top 10 Spots</div>
                     </div>
                     <div className="bg-amber-50 border border-amber-200/60 rounded-xl p-4 text-center">
-                      <div className="text-2xl font-black text-amber-600 mb-1">Journalist</div>
-                      <div className="text-xs font-semibold text-amber-800">of the Year</div>
+                      <div className="text-2xl font-black text-amber-600 mb-1">JOTY</div>
+                      <div className="text-xs font-semibold text-amber-800">Journalist of the Year</div>
                     </div>
                   </div>
 

@@ -11,6 +11,9 @@ frontend/out/
 build/
 dist/
 
+# large scraped data (exceeds GitHub 100MB limit)
+scraped-data/articles.json
+
 # misc
 .DS_Store
 *.pem

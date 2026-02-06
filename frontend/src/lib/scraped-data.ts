@@ -79,12 +79,17 @@ function filterContentImages(images: any[], title: string) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function transformArticle(raw: any, index: number): Article {
-  const slug = extractSlug(raw.link);
+  const slug = raw.slug || extractSlug(raw.link || "");
   const featuredImage = raw.featuredImage
     ? { url: raw.featuredImage, alternativeText: raw.title }
     : undefined;
 
-  const authorName = raw.author || "George Herald";
+  const authorName =
+    typeof raw.author === "string"
+      ? raw.author
+      : raw.author && typeof raw.author === "object" && typeof raw.author.name === "string"
+        ? raw.author.name
+        : "George Herald";
   const categoryName = formatCategoryName(raw.category);
   const sectionName = mapSection(raw.section, raw.category);
 
@@ -112,7 +117,7 @@ function transformArticle(raw: any, index: number): Article {
     author: {
       id: 1,
       name: authorName,
-      slug: authorName.toLowerCase().replace(/\s+/g, "-"),
+      slug: String(authorName).toLowerCase().replace(/\s+/g, "-"),
       role: "Journalist",
     },
     tags: raw.tags || [],
@@ -328,10 +333,19 @@ export function getArticleDetail(slug: string): Article | undefined {
     const raw = JSON.parse(fs.readFileSync(filePath, "utf-8"));
 
     const bodyText = cleanBodyText(raw.bodyText || "");
-    const bodyBlocks = parseBodyBlocks(raw.bodyHtml);
+    const bodyBlocks =
+      Array.isArray(raw.bodyBlocks) && raw.bodyBlocks.length > 0
+        ? (raw.bodyBlocks as ContentBlock[])
+        : parseBodyBlocks(raw.bodyHtml);
     const articleImages = filterContentImages(raw.images || [], article.title);
 
-    let authorName = raw.author || article.author?.name || "George Herald";
+    const authorNameRaw = raw.author || article.author?.name || "George Herald";
+    let authorName =
+      typeof authorNameRaw === "string"
+        ? authorNameRaw
+        : authorNameRaw && typeof authorNameRaw === "object" && typeof authorNameRaw.name === "string"
+          ? authorNameRaw.name
+          : "George Herald";
     if (!authorName && bodyText) {
       const match = bodyText.match(/Journalist\s+([A-Za-zÀ-ÿ\s]+?)(?:\n|$)/);
       if (match) authorName = match[1].trim();
@@ -351,7 +365,7 @@ export function getArticleDetail(slug: string): Article | undefined {
       author: {
         id: 1,
         name: authorName,
-        slug: authorName.toLowerCase().replace(/\s+/g, "-"),
+        slug: String(authorName).toLowerCase().replace(/\s+/g, "-"),
         role: "Journalist",
       },
     };
