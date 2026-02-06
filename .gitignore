@@ -4,6 +4,7 @@ node_modules/
 .pnp.js
 
 # next.js
+.next/
 frontend/.next/
 frontend/out/
 
