@@ -130,6 +130,7 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [translateOpen, setTranslateOpen] = useState(false);
   const [activeLang, setActiveLang] = useState("EN");
+  const [translateReady, setTranslateReady] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const translateRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -168,12 +169,23 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      const sel = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
+      if (sel) {
+        setTranslateReady(true);
+        window.clearInterval(id);
+      }
+    }, 300);
+    return () => window.clearInterval(id);
+  }, []);
+
   function setTranslateLanguage(lang: string, label: string) {
     const sel = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
     if (!sel) return;
 
     sel.value = lang;
-    sel.dispatchEvent(new Event("change"));
+    sel.dispatchEvent(new Event("change", { bubbles: true }));
     setActiveLang(label);
     setTranslateOpen(false);
   }
@@ -257,8 +269,13 @@ export default function Header() {
             <div id="google_translate_element" className="translate-widget" />
             <div className="relative">
               <button
-                onClick={() => setTranslateOpen((v) => !v)}
-                className="flex items-center gap-1 text-[12px] text-white/70 hover:text-white transition-colors"
+                onClick={() => {
+                  if (!translateReady) return;
+                  setTranslateOpen((v) => !v);
+                }}
+                className={`flex items-center gap-1 text-[12px] transition-colors ${
+                  translateReady ? "text-white/70 hover:text-white" : "text-white/40 cursor-not-allowed"
+                }`}
                 aria-label="Translate"
               >
                 <Globe className="h-3.5 w-3.5" />
