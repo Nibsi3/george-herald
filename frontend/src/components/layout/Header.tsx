@@ -172,7 +172,7 @@ export default function Header() {
   useEffect(() => {
     const id = window.setInterval(() => {
       const sel = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
-      if (sel) {
+      if (sel && sel.options && sel.options.length > 0) {
         setTranslateReady(true);
         window.clearInterval(id);
       }
@@ -181,13 +181,28 @@ export default function Header() {
   }, []);
 
   function setTranslateLanguage(lang: string, label: string) {
-    const sel = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
-    if (!sel) return;
+    let tries = 0;
+    const maxTries = 12;
 
-    sel.value = lang;
-    sel.dispatchEvent(new Event("change", { bubbles: true }));
-    setActiveLang(label);
-    setTranslateOpen(false);
+    const attempt = () => {
+      const sel = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
+      if (!sel || !sel.options || sel.options.length === 0) {
+        tries++;
+        if (tries < maxTries) window.setTimeout(attempt, 250);
+        return;
+      }
+
+      sel.value = lang;
+
+      const ev = document.createEvent("HTMLEvents");
+      ev.initEvent("change", true, true);
+      sel.dispatchEvent(ev);
+
+      setActiveLang(label);
+      setTranslateOpen(false);
+    };
+
+    attempt();
   }
 
   function handleSearchSubmit(e: React.FormEvent) {
