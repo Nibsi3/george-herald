@@ -57,16 +57,18 @@ function CategoryDropdown({ item }: { item: NavItem }) {
         <ChevronDown className="h-3 w-3" />
       </Link>
       {open && (
-        <div className="absolute top-full left-0 z-50 min-w-[200px] bg-white border border-border rounded-lg shadow-lg py-2 animate-in fade-in-0 zoom-in-95">
-          {item.children.map((child) => (
-            <Link
-              key={child.href}
-              href={child.href}
-              className="block px-4 py-2 text-sm text-foreground hover:bg-accent hover:text-primary transition-colors"
-            >
-              {child.label}
-            </Link>
-          ))}
+        <div className="absolute top-full left-0 z-50 min-w-[340px] bg-white border border-border rounded-lg shadow-lg p-2 animate-in fade-in-0 zoom-in-95">
+          <div className="grid grid-cols-2 gap-1">
+            {item.children.map((child) => (
+              <Link
+                key={child.href}
+                href={child.href}
+                className="px-3 py-2 text-sm text-foreground hover:bg-accent hover:text-primary transition-colors rounded-md"
+              >
+                {child.label}
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>
