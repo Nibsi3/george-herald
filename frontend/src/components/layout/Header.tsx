@@ -29,6 +29,7 @@ const topLinks = [
 ];
 
 const categoryLinks = [
+  { label: "NEWS", href: "/news" },
   { label: "SPORT", href: "/sport" },
   { label: "LIFE & ARTS", href: "/lifestyle" },
   { label: "SCHOOLS", href: "/schools" },
