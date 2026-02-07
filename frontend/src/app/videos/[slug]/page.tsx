@@ -38,12 +38,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export function generateStaticParams() {
-  const videoSlugs = videos.map((v) => ({ slug: v.slug }));
-  const categorySlugs = Object.keys(VIDEO_CATEGORIES).map((s) => ({ slug: s }));
-  return [...categorySlugs, ...videoSlugs];
-}
-
 export default async function VideoSlugPage({ params }: PageProps) {
   const { slug } = await params;
 

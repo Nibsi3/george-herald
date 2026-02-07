@@ -34,10 +34,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export function generateStaticParams() {
-  return articles.map((a) => ({ slug: a.slug }));
-}
-
 function renderBlock(block: ContentBlock, index: number) {
   switch (block.type) {
     case "heading":

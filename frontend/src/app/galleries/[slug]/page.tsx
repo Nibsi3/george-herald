@@ -39,12 +39,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export function generateStaticParams() {
-  const gallerySlugs = galleries.map((g) => ({ slug: g.slug }));
-  const categorySlugs = Object.keys(GALLERY_CATEGORIES).map((s) => ({ slug: s }));
-  return [...categorySlugs, ...gallerySlugs];
-}
-
 export default async function GallerySlugPage({ params }: PageProps) {
   const { slug } = await params;
 
