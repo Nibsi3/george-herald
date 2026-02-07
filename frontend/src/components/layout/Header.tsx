@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Menu, Search, X, ChevronDown, Cloud, Sun, AlertTriangle } from "lucide-react";
+import { Menu, Search, X, ChevronDown, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -19,19 +19,32 @@ interface SearchResult {
   publishedDate: string;
 }
 
-function DesktopNavItem({ item }: { item: NavItem }) {
+const topLinks = [
+  { label: "Home", href: "/" },
+  { label: "About Us", href: "/community/about-george" },
+  { label: "Videos", href: "/videos" },
+  { label: "Galleries", href: "/galleries" },
+  { label: "Contact", href: "/contact" },
+  { label: "Emergency Numbers", href: "/emergency-numbers" },
+];
+
+const categoryLinks = [
+  { label: "NEWS", href: "/news" },
+  { label: "SPORT", href: "/sport" },
+  { label: "BUSINESS", href: "/news/category/business" },
+  { label: "CRIME", href: "/news/category/crime" },
+  { label: "ENTERTAINMENT", href: "/entertainment" },
+  { label: "LIFESTYLE", href: "/lifestyle" },
+  { label: "SCHOOLS", href: "/schools" },
+  { label: "COMMUNITY", href: "/community" },
+  { label: "OPINION", href: "/opinion" },
+  { label: "CLASSIFIEDS", href: "/classifieds" },
+];
+
+function CategoryDropdown({ item }: { item: NavItem }) {
   const [open, setOpen] = useState(false);
 
-  if (!item.children) {
-    return (
-      <Link
-        href={item.href}
-        className="px-3 py-2 text-sm font-semibold text-foreground hover:text-primary transition-colors"
-      >
-        {item.label}
-      </Link>
-    );
-  }
+  if (!item.children) return null;
 
   return (
     <div
@@ -41,7 +54,7 @@ function DesktopNavItem({ item }: { item: NavItem }) {
     >
       <Link
         href={item.href}
-        className="flex items-center gap-1 px-3 py-2 text-sm font-semibold text-foreground hover:text-primary transition-colors"
+        className="flex items-center gap-0.5 px-3 py-2.5 text-xs font-bold tracking-wide text-foreground hover:text-primary transition-colors uppercase"
       >
         {item.label}
         <ChevronDown className="h-3 w-3" />
@@ -153,41 +166,25 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-      {/* Top bar */}
+    <header className="sticky top-0 z-50 w-full bg-white">
+      {/* ── ROW 1: Top utility bar (dark) ── */}
       <div className="bg-herald-black text-white">
-        <div className="container mx-auto px-4 flex items-center justify-between h-8">
-          <div className="flex items-center gap-4 text-xs">
-            <span className="text-white/70">
-              {new Date().toLocaleDateString("en-ZA", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </span>
-          </div>
-          <div className="flex items-center gap-3 text-xs">
-            <div className="flex items-center gap-1">
-              <Sun className="h-3 w-3 text-yellow-400" />
-              <span>George</span>
-              <span className="font-semibold">24°C</span>
-            </div>
-            <Link href="/contact" className="hover:text-primary transition-colors">
-              Contact Us
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Logo bar */}
-      <div className="border-b border-border">
-        <div className="container mx-auto px-4 flex items-center justify-between h-16 lg:h-20">
-          <div className="flex items-center gap-3">
-            {/* Mobile menu */}
+        <div className="container mx-auto px-4 flex items-center justify-between h-10">
+          <nav className="hidden md:flex items-center gap-1">
+            {topLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="px-3 py-1 text-[13px] font-medium text-white/90 hover:text-white transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="flex md:hidden items-center">
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden">
+                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
@@ -197,106 +194,220 @@ export default function Header() {
                     <Image src="/georgeherald_logo.png" alt="George Herald" width={160} height={40} className="h-9 w-auto" />
                   </Link>
                 </div>
-                <nav className="overflow-y-auto max-h-[calc(100vh-80px)]">
+                <div className="border-b border-border">
+                  {topLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="block px-4 py-3 text-sm font-semibold text-foreground border-b border-border/50"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+                <nav className="overflow-y-auto max-h-[calc(100vh-280px)]">
                   {mainNavigation.map((item) => (
                     <MobileNavItem key={item.href} item={item} onClose={() => setMobileOpen(false)} />
                   ))}
                 </nav>
               </SheetContent>
             </Sheet>
-
-            {/* Logo */}
-            <Link href="/" className="flex items-center">
-              <Image src="/georgeherald_logo.png" alt="George Herald" width={220} height={50} className="h-10 lg:h-12 w-auto" priority />
-            </Link>
           </div>
-
-          {/* Search & actions */}
-          <div className="flex items-center gap-2" ref={searchRef}>
-            {searchOpen ? (
-              <div className="relative">
-                <form
-                  onSubmit={handleSearchSubmit}
-                  className="flex items-center gap-2 animate-in slide-in-from-right-5"
-                >
-                  <div className="relative">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search articles..."
-                      className="w-48 md:w-72 h-9 pl-9"
-                      autoFocus
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onFocus={() => { if (searchResults.length > 0) setShowDropdown(true); }}
-                    />
-                  </div>
-                  <Button type="submit" size="sm" className="bg-primary hover:bg-primary/90 h-9 px-3">
-                    <Search className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => { setSearchOpen(false); setSearchQuery(""); setShowDropdown(false); }}>
-                    <X className="h-4 w-4" />
-                  </Button>
-                </form>
-
-                {showDropdown && searchResults.length > 0 && (
-                  <div className="absolute top-full right-0 mt-1 w-[320px] md:w-[400px] bg-white border border-border rounded-lg shadow-xl z-50 max-h-[400px] overflow-y-auto">
-                    {searchResults.map((result) => (
-                      <Link
-                        key={result.id}
-                        href={`/news/${result.slug}`}
-                        className="flex items-start gap-3 px-4 py-3 hover:bg-accent transition-colors border-b border-border/50 last:border-0"
-                        onClick={() => { setShowDropdown(false); setSearchOpen(false); setSearchQuery(""); }}
-                      >
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium leading-snug line-clamp-2">{result.title}</p>
-                          <span className="text-[11px] text-primary font-semibold uppercase mt-1 block">{result.category}</span>
-                        </div>
-                      </Link>
-                    ))}
-                    <button
-                      onClick={handleSearchSubmit as unknown as React.MouseEventHandler}
-                      className="w-full px-4 py-2.5 text-sm font-semibold text-primary hover:bg-accent transition-colors text-center"
-                    >
-                      View all results for &ldquo;{searchQuery}&rdquo; →
-                    </button>
-                  </div>
-                )}
-
-                {showDropdown && searchQuery.length >= 2 && searchResults.length === 0 && (
-                  <div className="absolute top-full right-0 mt-1 w-[320px] md:w-[400px] bg-white border border-border rounded-lg shadow-xl z-50 p-4 text-center">
-                    <p className="text-sm text-muted-foreground">No articles found for &ldquo;{searchQuery}&rdquo;</p>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)}>
-                <Search className="h-5 w-5" />
-              </Button>
-            )}
+          <div className="flex items-center gap-4">
+            <a href="https://www.facebook.com/georgeherald" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">
+              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+            <a href="https://www.instagram.com/georgeherald" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">
+              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            </a>
           </div>
         </div>
       </div>
 
-      {/* Desktop navigation */}
+      {/* ── ROW 2: Logo bar (white) ── */}
+      <div className="border-b border-border bg-white">
+        <div className="container mx-auto px-4 flex items-center justify-between h-20 lg:h-24">
+          <div className="hidden md:flex items-center text-sm text-muted-foreground">
+            {new Date().toLocaleDateString("en-ZA", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+            })}
+          </div>
+
+          <Link href="/" className="flex items-center mx-auto md:mx-0">
+            <Image src="/georgeherald_logo.png" alt="George Herald" width={260} height={60} className="h-12 lg:h-14 w-auto" priority />
+          </Link>
+
+          <div className="hidden md:flex items-center gap-1.5 text-sm text-muted-foreground">
+            <Sun className="h-4 w-4 text-yellow-500" />
+            <span className="font-semibold text-foreground">24°C</span>
+            <span>George, SA</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── ROW 3: Category navigation + Search (white, bordered) ── */}
       <nav className="hidden lg:block border-b border-border bg-white">
         <div className="container mx-auto px-4">
-          <div className="flex items-center h-11">
-            <div className="flex items-center justify-center gap-1 flex-1">
-              {mainNavigation.map((item) => (
-                <DesktopNavItem key={item.href} item={item} />
-              ))}
+          <div className="flex items-center justify-between h-11">
+            <div className="flex items-center">
+              {categoryLinks.map((link) => {
+                const navItem = mainNavigation.find(
+                  (n) => n.href === link.href || n.label.toUpperCase() === link.label
+                );
+                if (navItem && navItem.children) {
+                  return <CategoryDropdown key={link.href} item={navItem} />;
+                }
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="px-3 py-2.5 text-xs font-bold tracking-wide text-foreground hover:text-primary transition-colors uppercase"
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
             </div>
-            <Link
-              href="/emergency-numbers"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-primary hover:bg-primary/10 rounded-lg transition-colors shrink-0"
-              title="Emergency Numbers"
-            >
-              <AlertTriangle className="h-4 w-4" />
-              <span className="hidden xl:inline">Emergency Numbers</span>
-            </Link>
+
+            <div className="flex items-center" ref={searchRef}>
+              {searchOpen ? (
+                <div className="relative">
+                  <form
+                    onSubmit={handleSearchSubmit}
+                    className="flex items-center gap-2 animate-in slide-in-from-right-5"
+                  >
+                    <div className="relative">
+                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search articles..."
+                        className="w-48 md:w-72 h-9 pl-9"
+                        autoFocus
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onFocus={() => { if (searchResults.length > 0) setShowDropdown(true); }}
+                      />
+                    </div>
+                    <Button type="submit" size="sm" className="bg-primary hover:bg-primary/90 h-9 px-3">
+                      <Search className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => { setSearchOpen(false); setSearchQuery(""); setShowDropdown(false); }}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </form>
+
+                  {showDropdown && searchResults.length > 0 && (
+                    <div className="absolute top-full right-0 mt-1 w-[320px] md:w-[400px] bg-white border border-border rounded-lg shadow-xl z-50 max-h-[400px] overflow-y-auto">
+                      {searchResults.map((result) => (
+                        <Link
+                          key={result.id}
+                          href={`/news/${result.slug}`}
+                          className="flex items-start gap-3 px-4 py-3 hover:bg-accent transition-colors border-b border-border/50 last:border-0"
+                          onClick={() => { setShowDropdown(false); setSearchOpen(false); setSearchQuery(""); }}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium leading-snug line-clamp-2">{result.title}</p>
+                            <span className="text-[11px] text-primary font-semibold uppercase mt-1 block">{result.category}</span>
+                          </div>
+                        </Link>
+                      ))}
+                      <button
+                        onClick={handleSearchSubmit as unknown as React.MouseEventHandler}
+                        className="w-full px-4 py-2.5 text-sm font-semibold text-primary hover:bg-accent transition-colors text-center"
+                      >
+                        View all results for &ldquo;{searchQuery}&rdquo; →
+                      </button>
+                    </div>
+                  )}
+
+                  {showDropdown && searchQuery.length >= 2 && searchResults.length === 0 && (
+                    <div className="absolute top-full right-0 mt-1 w-[320px] md:w-[400px] bg-white border border-border rounded-lg shadow-xl z-50 p-4 text-center">
+                      <p className="text-sm text-muted-foreground">No articles found for &ldquo;{searchQuery}&rdquo;</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={() => setSearchOpen(true)}
+                  className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold tracking-wide text-foreground hover:text-primary transition-colors"
+                >
+                  <Search className="h-4 w-4" />
+                  Search
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </nav>
+
+      {/* Mobile: search + category bar below logo */}
+      <div className="lg:hidden border-b border-border bg-white">
+        <div className="container mx-auto px-4 flex items-center justify-between h-10">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            {new Date().toLocaleDateString("en-ZA", {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+            })}
+            <span className="mx-1">·</span>
+            <Sun className="h-3 w-3 text-yellow-500" />
+            <span className="font-semibold text-foreground">24°C</span>
+          </div>
+          <div ref={searchRef}>
+            {searchOpen ? (
+              <div className="relative">
+                <form
+                  onSubmit={handleSearchSubmit}
+                  className="flex items-center gap-1"
+                >
+                  <Input
+                    placeholder="Search..."
+                    className="w-40 h-8 text-xs"
+                    autoFocus
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => { if (searchResults.length > 0) setShowDropdown(true); }}
+                  />
+                  <Button type="submit" size="sm" className="h-8 px-2 bg-primary">
+                    <Search className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setSearchOpen(false); setSearchQuery(""); setShowDropdown(false); }}>
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                </form>
+
+                {showDropdown && searchResults.length > 0 && (
+                  <div className="absolute top-full right-0 mt-1 w-[280px] bg-white border border-border rounded-lg shadow-xl z-50 max-h-[300px] overflow-y-auto">
+                    {searchResults.map((result) => (
+                      <Link
+                        key={result.id}
+                        href={`/news/${result.slug}`}
+                        className="flex items-start gap-3 px-3 py-2.5 hover:bg-accent transition-colors border-b border-border/50 last:border-0"
+                        onClick={() => { setShowDropdown(false); setSearchOpen(false); setSearchQuery(""); }}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium leading-snug line-clamp-2">{result.title}</p>
+                          <span className="text-[10px] text-primary font-semibold uppercase mt-0.5 block">{result.category}</span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => setSearchOpen(true)}
+                className="flex items-center gap-1 text-xs font-bold text-foreground hover:text-primary transition-colors"
+              >
+                <Search className="h-3.5 w-3.5" />
+                Search
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
     </header>
   );
 }
