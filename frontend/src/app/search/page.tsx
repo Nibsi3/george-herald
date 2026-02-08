@@ -5,6 +5,7 @@ import SectionHeader from "@/components/sections/SectionHeader";
 import ArticleListPaginated from "@/components/ui/article-list-paginated";
 import { searchArticles } from "@/lib/scraped-data";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 interface SearchPageProps {
   searchParams: Promise<{ q?: string }>;
@@ -26,7 +27,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <div className="container mx-auto px-4 py-6 lg:py-8">
       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-        <a href="/" className="hover:text-primary transition-colors">Home</a>
+        <Link href="/" className="hover:text-primary transition-colors">Home</Link>
         <span>/</span>
         <span className="text-foreground font-medium">Search</span>
       </div>

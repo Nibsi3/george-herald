@@ -3,6 +3,7 @@ import MostReadSidebar from "@/components/sections/MostReadSidebar";
 import ArticleListPaginated from "@/components/ui/article-list-paginated";
 import { getArticlesByCategory, getArticlesBySection, getMostReadArticles, getTopStories } from "@/lib/scraped-data";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 const categoryMeta: Record<string, { title: string; description: string; section?: string }> = {
   "top-stories": { title: "Top Stories", description: "The most important news from George and the Garden Route." },
@@ -60,9 +61,9 @@ export default async function CategoryPage({ params }: PageProps) {
   return (
     <div className="container mx-auto px-4 py-6 lg:py-8">
       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-        <a href="/" className="hover:text-primary transition-colors">Home</a>
+        <Link href="/" className="hover:text-primary transition-colors">Home</Link>
         <span>/</span>
-        <a href="/news" className="hover:text-primary transition-colors">News</a>
+        <Link href="/news" className="hover:text-primary transition-colors">News</Link>
         <span>/</span>
         <span className="text-foreground font-medium">{meta.title}</span>
       </div>

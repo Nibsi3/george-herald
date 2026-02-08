@@ -1,5 +1,6 @@
 import { Phone, AlertTriangle, Zap, Droplets, Flame, Shield, Heart, Bug, Building2, Car, Waves } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Emergency Numbers - George & Garden Route",
@@ -144,7 +145,7 @@ export default function EmergencyNumbersPage() {
   return (
     <div className="container mx-auto px-4 py-6 lg:py-8">
       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-        <a href="/" className="hover:text-primary transition-colors">Home</a>
+        <Link href="/" className="hover:text-primary transition-colors">Home</Link>
         <span>/</span>
         <span className="text-foreground font-medium">Emergency Numbers</span>
       </div>

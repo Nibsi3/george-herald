@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   FolderTree,
   Plus,
@@ -38,11 +38,7 @@ export default function AdminCategoriesPage() {
   const [showNewForm, setShowNewForm] = useState(false);
   const [reassigning, setReassigning] = useState<{ from: string; to: string } | null>(null);
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  async function fetchCategories() {
+  const fetchCategories = useCallback(async () => {
     setLoading(true);
     const res = await fetch("/api/admin/articles?limit=99999");
     const data = await res.json();
@@ -65,7 +61,15 @@ export default function AdminCategoriesPage() {
     cats.sort((a, b) => b.count - a.count);
     setCategories(cats);
     setLoading(false);
-  }
+
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      fetchCategories();
+    }, 0);
+    return () => clearTimeout(t);
+  }, [fetchCategories]);
 
   function getCategoriesForSection(sectionKey: string) {
     const section = SECTIONS.find((s) => s.key === sectionKey);

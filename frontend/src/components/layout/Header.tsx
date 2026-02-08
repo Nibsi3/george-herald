@@ -126,12 +126,10 @@ export default function Header() {
   const router = useRouter();
 
   useEffect(() => {
-    if (searchQuery.length < 2) {
-      setSearchResults([]);
-      setShowDropdown(false);
-      return;
-    }
     if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    if (searchQuery.length < 2) return;
+
     debounceRef.current = setTimeout(async () => {
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
@@ -298,7 +296,14 @@ export default function Header() {
                         className="w-48 md:w-72 h-9 pl-9"
                         autoFocus
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          setSearchQuery(v);
+                          if (v.trim().length < 2) {
+                            setSearchResults([]);
+                            setShowDropdown(false);
+                          }
+                        }}
                         onFocus={() => { if (searchResults.length > 0) setShowDropdown(true); }}
                       />
                     </div>
@@ -380,7 +385,14 @@ export default function Header() {
                     className="w-40 h-8 text-xs"
                     autoFocus
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setSearchQuery(v);
+                      if (v.trim().length < 2) {
+                        setSearchResults([]);
+                        setShowDropdown(false);
+                      }
+                    }}
                     onFocus={() => { if (searchResults.length > 0) setShowDropdown(true); }}
                   />
                   <Button type="submit" size="sm" className="h-8 px-2 bg-primary">

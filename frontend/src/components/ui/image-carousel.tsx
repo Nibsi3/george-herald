@@ -24,7 +24,6 @@ export default function ImageCarousel({
   const trackRef = useRef<HTMLDivElement>(null);
 
   const totalImages = images.length;
-  if (totalImages === 0) return null;
 
   const goToNext = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % totalImages);
@@ -49,6 +48,8 @@ export default function ImageCarousel({
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [isHovered, lightboxOpen, goToNext, autoPlayInterval, totalImages]);
+
+  if (totalImages === 0) return null;
 
   return (
     <>
@@ -163,6 +164,7 @@ export default function ImageCarousel({
 
       {/* Full-screen lightbox */}
       <ImageLightbox
+        key={lightboxOpen ? `open-${currentIndex}` : "closed"}
         images={images}
         initialIndex={currentIndex}
         open={lightboxOpen}

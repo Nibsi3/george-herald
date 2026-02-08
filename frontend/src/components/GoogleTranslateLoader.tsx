@@ -8,7 +8,7 @@ export default function GoogleTranslateLoader() {
 
     const w = window as unknown as {
       googleTranslateElementInit?: () => void;
-      google?: any;
+      google?: unknown;
       __gh_translate_loaded__?: boolean;
     };
 
@@ -17,12 +17,34 @@ export default function GoogleTranslateLoader() {
 
     w.googleTranslateElementInit = () => {
       try {
-        if (!w.google?.translate?.TranslateElement) return;
-        new w.google.translate.TranslateElement(
+        type TranslateElementInlineLayout = { SIMPLE: unknown };
+        type TranslateElementCtor = new (
+          opts: {
+            pageLanguage: string;
+            includedLanguages: string;
+            layout: unknown;
+            autoDisplay: boolean;
+          },
+          containerId: string
+        ) => unknown;
+
+        type GoogleTranslateApi = {
+          translate?: {
+            TranslateElement?: TranslateElementCtor & { InlineLayout?: TranslateElementInlineLayout };
+          };
+        };
+
+        const googleApi = w.google as GoogleTranslateApi;
+        const TranslateElement = googleApi.translate?.TranslateElement;
+        const layout = TranslateElement?.InlineLayout?.SIMPLE;
+
+        if (!TranslateElement || !layout) return;
+
+        new TranslateElement(
           {
             pageLanguage: "en",
             includedLanguages: "en,af,zu,xh,st,nso,tn,ts,ss,ve,nr",
-            layout: w.google.translate.TranslateElement.InlineLayout.SIMPLE,
+            layout,
             autoDisplay: false,
           },
           "google_translate_element"

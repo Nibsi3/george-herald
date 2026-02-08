@@ -2,6 +2,7 @@ import GalleryCard from "@/components/cards/GalleryCard";
 import SectionHeader from "@/components/sections/SectionHeader";
 import { galleries } from "@/lib/scraped-data";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Photo Galleries",
@@ -12,7 +13,7 @@ export default function GalleriesPage() {
   return (
     <div className="container mx-auto px-4 py-6 lg:py-8">
       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-        <a href="/" className="hover:text-primary transition-colors">Home</a>
+        <Link href="/" className="hover:text-primary transition-colors">Home</Link>
         <span>/</span>
         <span className="text-foreground font-medium">Galleries</span>
       </div>

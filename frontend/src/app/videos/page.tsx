@@ -1,7 +1,8 @@
 import VideoCard from "@/components/cards/VideoCard";
 import SectionHeader from "@/components/sections/SectionHeader";
-import { getVideosBySection, videos } from "@/lib/scraped-data";
+import { videos } from "@/lib/scraped-data";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Videos",
@@ -14,7 +15,7 @@ export default function VideosPage() {
   return (
     <div className="container mx-auto px-4 py-6 lg:py-8">
       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-        <a href="/" className="hover:text-primary transition-colors">Home</a>
+        <Link href="/" className="hover:text-primary transition-colors">Home</Link>
         <span>/</span>
         <span className="text-foreground font-medium">Videos</span>
       </div>

@@ -93,12 +93,8 @@ export default function AdminArticlesPage() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [categoryModal, setCategoryModal] = useState<{ slug: string; current: string } | null>(null);
   const [toastMsg, setToastMsg] = useState("");
-  const [activeWs, setActiveWs] = useState(PARENT_WORKSPACE);
+  const [activeWs, setActiveWs] = useState(() => getWorkspaceId());
   const [newMenuOpen, setNewMenuOpen] = useState(false);
-
-  useEffect(() => {
-    setActiveWs(getWorkspaceId());
-  }, []);
 
   const fetchArticles = useCallback(async (page = 1) => {
     setLoading(true);
@@ -121,12 +117,18 @@ export default function AdminArticlesPage() {
   }, [search, section, category]);
 
   useEffect(() => {
-    fetchArticles(1);
+    const t = setTimeout(() => {
+      fetchArticles(1);
+    }, 0);
+    return () => clearTimeout(t);
   }, [fetchArticles]);
 
   useEffect(() => {
     if (searchParams.get("filter") === "top") {
-      setCategory("top-stories");
+      const t = setTimeout(() => {
+        setCategory("top-stories");
+      }, 0);
+      return () => clearTimeout(t);
     }
   }, [searchParams]);
 

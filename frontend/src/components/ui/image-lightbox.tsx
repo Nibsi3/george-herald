@@ -21,11 +21,6 @@ export default function ImageLightbox({
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [zoomed, setZoomed] = useState(false);
 
-  useEffect(() => {
-    setCurrentIndex(initialIndex);
-    setZoomed(false);
-  }, [initialIndex, open]);
-
   const goNext = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % images.length);
     setZoomed(false);

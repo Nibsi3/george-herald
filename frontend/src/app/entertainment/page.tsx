@@ -3,6 +3,7 @@ import MostReadSidebar from "@/components/sections/MostReadSidebar";
 import ArticleListPaginated from "@/components/ui/article-list-paginated";
 import { getArticlesByCategory, getArticlesBySection, getMostReadArticles } from "@/lib/scraped-data";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Entertainment",
@@ -25,7 +26,7 @@ export default function EntertainmentPage() {
   return (
     <div className="container mx-auto px-4 py-6 lg:py-8">
       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-        <a href="/" className="hover:text-primary transition-colors">Home</a>
+        <Link href="/" className="hover:text-primary transition-colors">Home</Link>
         <span>/</span>
         <span className="text-foreground font-medium">Entertainment</span>
       </div>
