@@ -23,6 +23,8 @@ export default function ArticleCard({ article, variant = "default" }: ArticleCar
               alt={article.title}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
+              quality={90}
+              sizes="80px"
             />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5" />
@@ -51,6 +53,8 @@ export default function ArticleCard({ article, variant = "default" }: ArticleCar
               alt={article.title}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
+              quality={90}
+              sizes="(max-width: 640px) 128px, 160px"
             />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5" />
@@ -95,6 +99,8 @@ export default function ArticleCard({ article, variant = "default" }: ArticleCar
             alt={article.title}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
+            quality={90}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5" />

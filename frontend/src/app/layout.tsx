@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import GoogleTranslateLoader from "@/components/GoogleTranslateLoader";
+import SiteChrome from "@/components/layout/SiteChrome";
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -19,7 +17,6 @@ export const metadata: Metadata = {
     "Your trusted source for local news, sport, and community stories from George and the Garden Route.",
   keywords: ["George Herald", "Garden Route", "News", "George", "South Africa", "Local News"],
   icons: {
-    icon: "/georgeherald_favicon.png",
     apple: "/georgeherald_favicon.png",
   },
   openGraph: {
@@ -38,10 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} font-sans antialiased`}>
-        <Header />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
-        <GoogleTranslateLoader />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );

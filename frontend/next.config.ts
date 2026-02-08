@@ -10,7 +10,11 @@ const nextConfig: NextConfig = {
         hostname: "**",
       },
     ],
-    qualities: [75, 85, 90],
+    qualities: [80, 90, 100],
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 31536000,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   async headers() {
     return [
@@ -29,7 +33,13 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/((?!api).*)",
+        source: "/_next/image(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400, s-maxage=31536000, stale-while-revalidate=31536000" },
+        ],
+      },
+      {
+        source: "/((?!api|_next).*)",
         headers: [
           { key: "Cache-Control", value: "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400" },
         ],

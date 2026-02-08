@@ -9,6 +9,7 @@ import { formatDistanceToNow, format } from "date-fns";
 import { getArticleBySlug, getArticleDetail, getArticlesBySection, getMostReadArticles, articles } from "@/lib/scraped-data";
 import ArticleCard from "@/components/cards/ArticleCard";
 import MostReadSidebar from "@/components/sections/MostReadSidebar";
+import ViewTracker from "@/components/ViewTracker";
 import SectionHeader from "@/components/sections/SectionHeader";
 import ImageCarousel from "@/components/ui/image-carousel";
 import ShareButtons from "@/components/ui/share-buttons";
@@ -192,6 +193,7 @@ export default async function ArticlePage({ params }: PageProps) {
 
   return (
     <div className="container mx-auto px-4 py-6 lg:py-8">
+      <ViewTracker slug={slug} />
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
         <Link href="/" className="hover:text-primary transition-colors">Home</Link>
@@ -258,6 +260,7 @@ export default async function ArticlePage({ params }: PageProps) {
                 fill
                 className="object-cover"
                 priority
+                quality={100}
                 sizes="(max-width: 768px) 100vw, 66vw"
               />
             </div>

@@ -21,6 +21,8 @@ export default function VideoCard({ video }: VideoCardProps) {
             alt={video.title}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
+            quality={90}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-herald-black/60 to-herald-black/90" />

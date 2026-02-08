@@ -5,6 +5,44 @@ import galleriesRaw from "@/data/galleries.json";
 import fs from "fs";
 import path from "path";
 
+// Load real click-based view counts
+const VIEWS_FILE = path.join(process.cwd(), "src", "data", "views.json");
+function loadViewCounts(): Record<string, number> {
+  try {
+    return JSON.parse(fs.readFileSync(VIEWS_FILE, "utf-8"));
+  } catch {
+    return {};
+  }
+}
+const viewCounts = loadViewCounts();
+
+export const PARENT_WORKSPACE = "george-herald";
+
+// Workspace slug → route path mapping
+export const WORKSPACE_ROUTES: Record<string, string> = {
+  "george-herald": "/",
+  "knysna-plett-herald": "/knysna-plett",
+  "mossel-bay-advertiser": "/mossel-bay",
+  "oudtshoorn-courant": "/oudtshoorn",
+  "graaff-reinet-advertiser": "/graaff-reinet",
+};
+
+// Route path → workspace slug mapping
+export const ROUTE_TO_WORKSPACE: Record<string, string> = {
+  "knysna-plett": "knysna-plett-herald",
+  "mossel-bay": "mossel-bay-advertiser",
+  "oudtshoorn": "oudtshoorn-courant",
+  "graaff-reinet": "graaff-reinet-advertiser",
+};
+
+export const WORKSPACE_NAMES: Record<string, string> = {
+  "george-herald": "George Herald",
+  "knysna-plett-herald": "Knysna-Plett Herald",
+  "mossel-bay-advertiser": "Mossel Bay Advertiser",
+  "oudtshoorn-courant": "Oudtshoorn Courant",
+  "graaff-reinet-advertiser": "Graaff-Reinet Advertiser",
+};
+
 function hashViewCount(slug: string, index: number): number {
   let hash = 0;
   const str = slug + String(index);
@@ -124,9 +162,10 @@ function transformArticle(raw: any, index: number): Article {
     isTopStory: raw.isTopStory === true || raw.category === "top-stories",
     isBreaking: false,
     isFeatured: index < 3,
-    viewCount: hashViewCount(slug, index),
+    viewCount: viewCounts[slug] || hashViewCount(slug, index),
     publishedDate: raw.updated || new Date().toISOString(),
     section: sectionName,
+    workspace: raw.workspace || PARENT_WORKSPACE,
     createdAt: raw.updated || new Date().toISOString(),
     updatedAt: raw.updated || new Date().toISOString(),
   };
@@ -307,7 +346,7 @@ export const galleries: Gallery[] = (galleriesRaw as unknown[]).map(transformGal
 
 // Helper getters
 export function getTopStories(): Article[] {
-  return articles.filter((a) => a.isTopStory).slice(0, 10);
+  return articles.filter((a) => a.isTopStory).slice(0, 20);
 }
 
 export function getArticlesBySection(section: string, limit = 10): Article[] {
@@ -424,4 +463,48 @@ export function searchArticles(query: string, limit = 20): Article[] {
         a.excerpt.toLowerCase().includes(q)
     )
     .slice(0, limit);
+}
+
+// ═══════ WORKSPACE-FILTERED GETTERS ═══════
+// These filter articles based on workspace content distribution rules:
+// - GH workspace: only GH articles
+// - Other workspace: GH articles + that workspace's own local articles (local first)
+
+function isGHArticle(a: Article): boolean {
+  return !a.workspace || a.workspace === PARENT_WORKSPACE;
+}
+
+function filterByWorkspace(list: Article[], workspaceId: string): Article[] {
+  if (workspaceId === PARENT_WORKSPACE) {
+    // GH: only GH articles
+    return list.filter(isGHArticle);
+  }
+  // Other workspace: local articles first, then GH articles
+  const local = list.filter((a) => a.workspace === workspaceId);
+  const gh = list.filter(isGHArticle);
+  return [...local, ...gh];
+}
+
+export function getTopStoriesForWorkspace(workspaceId: string): Article[] {
+  const filtered = filterByWorkspace(articles, workspaceId);
+  return filtered.filter((a) => a.isTopStory).slice(0, 20);
+}
+
+export function getLatestArticlesForWorkspace(workspaceId: string, limit = 12): Article[] {
+  const filtered = filterByWorkspace(articles, workspaceId);
+  return [...filtered]
+    .sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime())
+    .slice(0, limit);
+}
+
+export function getMostReadArticlesForWorkspace(workspaceId: string, limit = 10): Article[] {
+  const filtered = filterByWorkspace(articles, workspaceId);
+  return [...filtered]
+    .sort((a, b) => b.viewCount - a.viewCount)
+    .slice(0, limit);
+}
+
+export function getArticlesBySectionForWorkspace(workspaceId: string, section: string, limit = 10): Article[] {
+  const filtered = filterByWorkspace(articles, workspaceId);
+  return filtered.filter((a) => a.section === section).slice(0, limit);
 }

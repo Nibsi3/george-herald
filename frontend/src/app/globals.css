@@ -147,38 +147,3 @@
 .prose-george a:hover {
   color: oklch(0.45 0.245 27.325);
 }
-
-/* Google Translate: compact inline select in top bar */
-.translate-widget .goog-te-gadget {
-  font-size: 0 !important;
-}
-.translate-widget .goog-te-gadget > span {
-  display: none !important;
-}
-.translate-widget .goog-te-gadget .goog-te-combo {
-  font-size: 12px !important;
-  background: transparent !important;
-  color: rgba(255, 255, 255, 0.75) !important;
-  border: 1px solid rgba(255, 255, 255, 0.25) !important;
-  border-radius: 4px !important;
-  padding: 2px 6px !important;
-  outline: none !important;
-  cursor: pointer !important;
-  font-family: inherit !important;
-}
-.translate-widget .goog-te-gadget .goog-te-combo:hover {
-  border-color: rgba(255, 255, 255, 0.45) !important;
-  color: rgba(255, 255, 255, 0.9) !important;
-}
-
-/* Hide Google Translate top banner iframe + tooltip UI */
-iframe.goog-te-banner-frame {
-  display: none !important;
-}
-#goog-gt-tt,
-.goog-te-balloon-frame {
-  display: none !important;
-}
-body {
-  top: 0 !important;
-}

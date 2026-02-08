@@ -61,6 +61,16 @@
     "viewCount": {
       "type": "integer",
       "default": 0
+    },
+    "tags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::tag.tag"
+    },
+    "author": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::author.author"
     }
   }
 }

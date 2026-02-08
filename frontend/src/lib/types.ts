@@ -70,6 +70,7 @@ export interface Article {
   viewCount: number;
   publishedDate: string;
   section: string;
+  workspace?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -22,6 +22,8 @@ export default function GalleryCard({ gallery }: GalleryCardProps) {
             alt={gallery.title}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
+            quality={90}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">

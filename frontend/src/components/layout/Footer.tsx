@@ -36,7 +36,7 @@ export default function Footer() {
               <a href="https://www.instagram.com/georgeheraldnews/" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-primary transition-colors" aria-label="Instagram">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="https://www.youtube.com/channel/UCrTKSG0b9GJSoT7kLPa7qCw/videos?view_as=subscriber" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-primary transition-colors" aria-label="YouTube">
+              <a href="https://www.youtube.com/@georgeherald" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-primary transition-colors" aria-label="YouTube">
                 <Youtube className="h-5 w-5" />
               </a>
               <a href="https://www.tiktok.com/@thegeorgeherald" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-primary transition-colors" aria-label="TikTok">

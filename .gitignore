@@ -29,6 +29,9 @@ yarn-error.log*
 .env
 .env*.local
 
+# Ghost CMS (local install)
+cms/
+
 # vercel
 .vercel
 

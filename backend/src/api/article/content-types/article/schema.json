@@ -94,6 +94,30 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::gallery.gallery"
+    },
+    "sourceUrl": {
+      "type": "string"
+    },
+    "articleImages": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": ["images"]
+    },
+    "bodyText": {
+      "type": "richtext"
+    },
+    "seoTitle": {
+      "type": "string",
+      "maxLength": 70
+    },
+    "seoDescription": {
+      "type": "text",
+      "maxLength": 160
+    },
+    "videos": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::video.video"
     }
   }
 }

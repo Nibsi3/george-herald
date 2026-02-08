@@ -1,0 +1,30 @@
+[
+  {
+    "id": "admin-001",
+    "email": "admin@georgeherald.com",
+    "password": "georgeherald2026",
+    "name": "Admin",
+    "role": "super_admin",
+    "workspaces": [
+      "george-herald",
+      "knysna-plett-herald",
+      "mossel-bay-advertiser",
+      "oudtshoorn-courant",
+      "graaff-reinet-advertiser"
+    ],
+    "activeWorkspace": "george-herald",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "user-1770529157350",
+    "email": "sweedienibs@gmail.com",
+    "password": "!!Ancam123",
+    "name": "cameron falck",
+    "role": "editor",
+    "workspaces": [
+      "knysna-plett-herald"
+    ],
+    "activeWorkspace": "knysna-plett-herald",
+    "createdAt": "2026-02-08T05:39:17.350Z"
+  }
+]

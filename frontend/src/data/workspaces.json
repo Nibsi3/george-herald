@@ -1,0 +1,118 @@
+[
+  {
+    "id": "george-herald",
+    "name": "George Herald",
+    "shortName": "GH",
+    "domain": "https://www.georgeherald.com",
+    "color": "#DC2626",
+    "weatherCity": "George",
+    "communityLabel": "Welcome to George",
+    "communityLink": "/Community/Heritage",
+    "epaperLink": "https://www.magzter.com/ZA/Caxton-Newspapers/George-Herald/Newspaper/",
+    "whatsappLink": "https://whatsapp.com/channel/0029VaNwpHsFcovzVDNsRk2X",
+    "heroArticleSlugs": [
+      "u3a-george-offers-varied-february-programme-202602040109",
+      "court-orders-psychiatric-evaluation-for-van-druten-bail-application-withdrawn-202602061209",
+      "rugbyfees-more-op-outeniquapark-202602061205"
+    ],
+    "sections": [
+      "news",
+      "sport",
+      "entertainment",
+      "opinion",
+      "community",
+      "lifestyle"
+    ],
+    "description": "George's leading community newspaper"
+  },
+  {
+    "id": "knysna-plett-herald",
+    "name": "Knysna-Plett Herald",
+    "shortName": "KPH",
+    "domain": "https://www.knysnaplettherald.com",
+    "color": "#DC2626",
+    "weatherCity": "Knysna",
+    "communityLabel": "About Our Area",
+    "communityLink": "/Pages/About-Our-Area",
+    "epaperLink": "https://www.magzter.com/ZA/Caxton-Newspapers/Knysna-Plett-Herald/Newspaper/",
+    "whatsappLink": "",
+    "heroArticleSlugs": [],
+    "sections": [
+      "news",
+      "sport",
+      "entertainment",
+      "opinion",
+      "community",
+      "lifestyle"
+    ],
+    "description": "Knysna & Plettenberg Bay's trusted news source"
+  },
+  {
+    "id": "mossel-bay-advertiser",
+    "name": "Mossel Bay Advertiser",
+    "shortName": "MBA",
+    "domain": "https://www.mosselbayadvertiser.com",
+    "color": "#DC2626",
+    "weatherCity": "Mossel Bay",
+    "communityLabel": "Visit Mossel Bay",
+    "communityLink": "/Pages/Visit-Mossel-Bay",
+    "epaperLink": "https://www.magzter.com/ZA/Caxton-Newspapers/Mossel-Bay-Advertiser/Newspaper/",
+    "whatsappLink": "",
+    "heroArticleSlugs": [],
+    "sections": [
+      "news",
+      "sport",
+      "entertainment",
+      "opinion",
+      "community",
+      "lifestyle"
+    ],
+    "description": "Mossel Bay's community newspaper"
+  },
+  {
+    "id": "oudtshoorn-courant",
+    "name": "Oudtshoorn Courant",
+    "shortName": "OC",
+    "domain": "https://www.oudtshoorncourant.com",
+    "color": "#DC2626",
+    "weatherCity": "Oudtshoorn",
+    "communityLabel": "Visit Oudtshoorn",
+    "communityLink": "/Pages/Visit-Oudtshoorn",
+    "epaperLink": "https://www.magzter.com/ZA/Caxton-Newspapers/Oudtshoorn-Courant/Newspaper/",
+    "whatsappLink": "",
+    "heroArticleSlugs": [],
+    "sections": [
+      "news",
+      "sport",
+      "entertainment",
+      "opinion",
+      "community",
+      "lifestyle"
+    ],
+    "description": "Oudtshoorn's local newspaper"
+  },
+  {
+    "id": "graaff-reinet-advertiser",
+    "name": "Graaff-Reinet Advertiser",
+    "shortName": "GRA",
+    "domain": "https://www.graaffreinetadvertiser.com",
+    "color": "#DC2626",
+    "weatherCity": "Graaff-Reinet",
+    "communityLabel": "Visit Graaff-Reinet",
+    "communityLink": "/Pages/Visit-Graaff-Reinet",
+    "epaperLink": "",
+    "whatsappLink": "",
+    "heroArticleSlugs": [
+      "dqwqwdqwdqwdqwd-202602080534"
+    ],
+    "sections": [
+      "news",
+      "sport",
+      "entertainment",
+      "opinion",
+      "community",
+      "lifestyle"
+    ],
+    "description": "Graaff-Reinet's community newspaper"
+  }
+]
