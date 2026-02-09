@@ -2,10 +2,19 @@ import fs from "fs";
 import path from "path";
 import Link from "next/link";
 import { FileText, FolderTree, Tags, TrendingUp, Clock, Star, Zap } from "lucide-react";
+import { cookies } from "next/headers";
 
-function getStats() {
+const PARENT_WORKSPACE = "george-herald";
+
+function getStats(activeWorkspace: string) {
   const articlesFile = path.join(process.cwd(), "src", "data", "articles.json");
-  const articles = JSON.parse(fs.readFileSync(articlesFile, "utf-8")) as Record<string, unknown>[];
+  let articles = JSON.parse(fs.readFileSync(articlesFile, "utf-8")) as Record<string, unknown>[];
+
+  // Filter articles by active workspace — each workspace only sees its own articles
+  articles = articles.filter((a) => {
+    const ws = (a.workspace as string) || PARENT_WORKSPACE;
+    return ws === activeWorkspace;
+  });
 
   const total = articles.length;
   const topStories = articles.filter((a) => a.isTopStory).length;
@@ -66,8 +75,10 @@ function getStats() {
   };
 }
 
-export default function AdminDashboardPage() {
-  const stats = getStats();
+export default async function AdminDashboardPage() {
+  const cookieStore = await cookies();
+  const activeWorkspace = cookieStore.get("gh_workspace")?.value || PARENT_WORKSPACE;
+  const stats = getStats(activeWorkspace);
 
   const cards = [
     { label: "Total Articles", value: stats.total.toLocaleString(), icon: FileText, color: "bg-blue-500", href: "/admin/articles" },
@@ -82,7 +93,7 @@ export default function AdminDashboardPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-black text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">Overview of your George Herald content</p>
+        <p className="text-sm text-gray-500 mt-1">Overview of your {activeWorkspace === PARENT_WORKSPACE ? "George Herald" : activeWorkspace.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())} content</p>
       </div>
 
       {/* Stats cards */}

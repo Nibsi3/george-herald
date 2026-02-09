@@ -102,6 +102,8 @@ export default function AdminShell({ session, children }: AdminShellProps) {
       });
       if (res.ok) {
         setActiveWs(wsId);
+        // Set cookie client-side so it's guaranteed before reload
+        document.cookie = `gh_workspace=${wsId};path=/;max-age=${60 * 60 * 24 * 7};samesite=lax`;
         // Cache workspace in localStorage so it persists across sessions
         try { localStorage.setItem("gh_workspace", wsId); } catch {}
         // Hard reload so all client components re-read the workspace cookie

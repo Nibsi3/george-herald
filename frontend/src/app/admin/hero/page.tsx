@@ -65,7 +65,8 @@ export default function AdminHeroPage() {
   const handleSearch = useCallback(async () => {
     if (!search.trim()) { setSearchResults([]); return; }
     setSearching(true);
-    const res = await fetch(`/api/admin/articles?search=${encodeURIComponent(search)}&limit=10`);
+    const wsId = getWorkspaceId();
+    const res = await fetch(`/api/admin/articles?search=${encodeURIComponent(search)}&limit=10&workspace=${encodeURIComponent(wsId)}`);
     const data = await res.json();
     setSearchResults((data.articles || []).filter((a: ArticleListing) => !heroSlugs.includes(a.slug)));
     setSearching(false);
