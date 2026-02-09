@@ -278,11 +278,11 @@ async function scrapePagedListing(baseUrl, endpoint, query1, maxPages = 10) {
       if (pageLinks.length === 0) break;
       pageLinks.forEach(l => links.add(l));
 
-      // Stop if all articles on this page are older than 2025
+      // Stop if all articles on this page are older than 2024
       let oldCount = 0;
       for (const link of pageLinks) {
         const year = getYearFromUrl(link);
-        if (year && year < 2025) oldCount++;
+        if (year && year < 2024) oldCount++;
       }
       if (oldCount === pageLinks.length) break;
 
@@ -295,6 +295,24 @@ async function scrapePagedListing(baseUrl, endpoint, query1, maxPages = 10) {
   return links;
 }
 
+// Extract article links from RSS XML for any domain
+function extractLinksFromRss(xml, baseUrl) {
+  const links = new Set();
+  const domain = baseUrl.replace("https://www.", "");
+  const regex = /<link>(https?:\/\/[^<]*Article[^<]*)<\/link>/g;
+  let match;
+  while ((match = regex.exec(xml)) !== null) {
+    if (match[1].includes(domain)) links.add(decodeURIComponent(match[1]));
+  }
+  // Also try <link> without domain filter for same-domain feeds
+  const regex2 = /<link>([^<]+\/Article\/[^<]+)<\/link>/g;
+  while ((match = regex2.exec(xml)) !== null) {
+    const href = match[1].startsWith("http") ? match[1] : baseUrl + match[1];
+    links.add(decodeURIComponent(href));
+  }
+  return Array.from(links);
+}
+
 async function scrapeWorkspace(workspace) {
   console.log(`\n${"=".repeat(60)}`);
   console.log(`  Scraping: ${workspace.name} (${workspace.baseUrl})`);
@@ -302,20 +320,83 @@ async function scrapeWorkspace(workspace) {
 
   const allLinks = new Set();
 
-  // Method 1: Try paginated listing (POST API) for News
-  console.log(`  Trying paginated News listing...`);
+  // Method 1: RSS feeds for article discovery
+  console.log(`  Scraping RSS feeds...`);
+  const rssFeeds = [
+    "/RSS/ArticleFeed/TopStories",
+    "/RSS/ArticleFeed/News",
+    "/RSS/ArticleFeed/Local%20News",
+    "/RSS/ArticleFeed/Business",
+    "/RSS/ArticleFeed/Crime",
+    "/RSS/ArticleFeed/General%20News",
+    "/RSS/ArticleFeed/Environment",
+    "/RSS/ArticleFeed/Agriculture",
+    "/RSS/ArticleFeed/Politics",
+    "/RSS/ArticleFeed/LifeStyle",
+    "/RSS/ArticleFeed/Entertainment",
+    "/RSS/ArticleFeed/Entertainment%20News",
+    "/RSS/ArticleFeed/Property",
+    "/RSS/ArticleFeed/Schools",
+    "/RSS/ArticleFeed/Sport",
+    "/RSS/ArticleFeed/Latest%20Sport",
+    "/RSS/ArticleFeed/Rugby",
+    "/RSS/ArticleFeed/Cricket",
+    "/RSS/ArticleFeed/Football",
+    "/RSS/ArticleFeed/Golf",
+    "/RSS/ArticleFeed/Tennis",
+    "/RSS/ArticleFeed/Athletics",
+    "/RSS/ArticleFeed/Other",
+    "/RSS/ArticleFeed/National%20News",
+    "/RSS/ArticleFeed/Motoring",
+    "/RSS/ArticleFeed/Lifestyle",
+  ];
+  for (const feed of rssFeeds) {
+    try {
+      const res = await axios.get(workspace.baseUrl + feed, {
+        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
+        timeout: 15000,
+      });
+      const rssLinks = extractLinksFromRss(res.data, workspace.baseUrl);
+      let added = 0;
+      rssLinks.forEach(l => { if (!allLinks.has(l)) { allLinks.add(l); added++; } });
+      if (added > 0) process.stdout.write(`    RSS ${feed.split('/').pop()}: +${added}  `);
+    } catch (err) { /* silently skip */ }
+    await sleep(150);
+  }
+  console.log(`\n    RSS total: ${allLinks.size}`);
+
+  // Method 2: Paginated listings (POST API) - deep crawl
+  console.log(`  Crawling paginated listings...`);
   const categories = [
+    { endpoint: "/News/PagedListing", query1: "Top-Stories", label: "Top Stories" },
     { endpoint: "/News/PagedListing", query1: "Local-News", label: "Local News" },
     { endpoint: "/News/PagedListing", query1: "Crime", label: "Crime" },
     { endpoint: "/News/PagedListing", query1: "General-News", label: "General News" },
     { endpoint: "/News/PagedListing", query1: "Business", label: "Business" },
+    { endpoint: "/News/PagedListing", query1: "National", label: "National" },
+    { endpoint: "/News/PagedListing", query1: "Environment", label: "Environment" },
+    { endpoint: "/News/PagedListing", query1: "Agriculture", label: "Agriculture" },
+    { endpoint: "/News/PagedListing", query1: "Politics", label: "Politics" },
+    { endpoint: "/News/PagedListing", query1: "LifeStyle", label: "Lifestyle" },
+    { endpoint: "/News/PagedListing", query1: "Entertainment-News", label: "Entertainment News" },
+    { endpoint: "/News/PagedListing", query1: "Property", label: "Property" },
+    { endpoint: "/News/PagedListing", query1: "Schools", label: "Schools" },
+    { endpoint: "/News/PagedListing", query1: "Motoring", label: "Motoring" },
     { endpoint: "/News/PagedListing", query1: "", label: "All News" },
-    { endpoint: "/Sport/PagedListing", query1: "", label: "Sport" },
+    { endpoint: "/Sport/PagedListing", query1: "Rugby", label: "Rugby" },
+    { endpoint: "/Sport/PagedListing", query1: "Cricket", label: "Cricket" },
+    { endpoint: "/Sport/PagedListing", query1: "Football", label: "Football" },
+    { endpoint: "/Sport/PagedListing", query1: "Golf", label: "Golf" },
+    { endpoint: "/Sport/PagedListing", query1: "Athletics", label: "Athletics" },
+    { endpoint: "/Sport/PagedListing", query1: "", label: "All Sport" },
+    { endpoint: "/Entertainment/PagedListing", query1: "", label: "Entertainment" },
+    { endpoint: "/Opinion/PagedListing", query1: "", label: "Opinion" },
+    { endpoint: "/Community/PagedListing", query1: "", label: "Community" },
   ];
 
   for (const cat of categories) {
     try {
-      const links = await scrapePagedListing(workspace.baseUrl, cat.endpoint, cat.query1, 5);
+      const links = await scrapePagedListing(workspace.baseUrl, cat.endpoint, cat.query1, 50);
       let added = 0;
       for (const link of links) {
         if (!allLinks.has(link)) { allLinks.add(link); added++; }
@@ -327,41 +408,32 @@ async function scrapeWorkspace(workspace) {
     await sleep(DELAY_MS);
   }
 
-  // Method 2: Scrape the /News listing page directly
-  console.log(`  Scraping /News listing page...`);
-  const newsHtml = await fetchPage(workspace.baseUrl + "/News");
-  if (newsHtml) {
-    const newsLinks = extractArticleLinks(newsHtml, workspace.baseUrl);
-    let added = 0;
-    newsLinks.forEach(l => { if (!allLinks.has(l)) { allLinks.add(l); added++; } });
-    console.log(`    /News page: ${newsLinks.length} found, ${added} new`);
+  // Method 3: Scrape listing pages directly
+  console.log(`  Scraping listing pages...`);
+  const listingPages = [
+    "/News", "/News/Top-Stories", "/Sport", "/Entertainment",
+    "/Opinion/Latest", "/Community", "/Letters",
+  ];
+  for (const page of listingPages) {
+    const html = await fetchPage(workspace.baseUrl + page);
+    if (html) {
+      const links = extractArticleLinks(html, workspace.baseUrl);
+      let added = 0;
+      links.forEach(l => { if (!allLinks.has(l)) { allLinks.add(l); added++; } });
+      if (added > 0) console.log(`    ${page}: +${added} new`);
+    }
+    await sleep(DELAY_MS);
   }
 
-  // Method 3: Also check /News/Top-Stories
-  const topHtml = await fetchPage(workspace.baseUrl + "/News/Top-Stories");
-  if (topHtml) {
-    const topLinks = extractArticleLinks(topHtml, workspace.baseUrl);
-    let added = 0;
-    topLinks.forEach(l => { if (!allLinks.has(l)) { allLinks.add(l); added++; } });
-    console.log(`    /News/Top-Stories: ${topLinks.length} found, ${added} new`);
-  }
-
-  // Method 4: Try Sport
-  const sportHtml = await fetchPage(workspace.baseUrl + "/Sport");
-  if (sportHtml) {
-    const sportLinks = extractArticleLinks(sportHtml, workspace.baseUrl);
-    let added = 0;
-    sportLinks.forEach(l => { if (!allLinks.has(l)) { allLinks.add(l); added++; } });
-    console.log(`    /Sport: ${sportLinks.length} found, ${added} new`);
-  }
-
-  // Filter to 2025-2026 only
+  // Filter to 2024-2026
   const recentLinks = [];
+  let excluded = 0;
   for (const link of allLinks) {
     const year = getYearFromUrl(link);
-    if (!year || year >= 2025) recentLinks.push(link);
+    if (!year || year >= 2024) recentLinks.push(link);
+    else excluded++;
   }
-  console.log(`  Total links: ${allLinks.size}, Recent (2025+): ${recentLinks.length}`);
+  console.log(`  Total links: ${allLinks.size}, Recent (2024+): ${recentLinks.length}, Excluded: ${excluded}`);
 
   return recentLinks;
 }
@@ -383,7 +455,9 @@ async function main() {
   let totalSkipped = 0;
   let totalDuplicates = 0;
 
-  for (const workspace of WORKSPACES) {
+  // Skip george-herald - already fully scraped
+  const subWorkspaces = WORKSPACES.filter(ws => ws.id !== "george-herald");
+  for (const workspace of subWorkspaces) {
     const articleLinks = await scrapeWorkspace(workspace);
 
     console.log(`\n  Scraping ${articleLinks.length} article pages for ${workspace.name}...`);
@@ -415,15 +489,13 @@ async function main() {
         continue;
       }
 
-      // For non-GH workspaces, check if article title/content contains location keywords
-      // to avoid adding articles that don't belong to this workspace
-      if (workspace.id !== "george-herald") {
+      // For non-GH workspaces, always accept articles from the workspace's own domain
+      // Only check keywords for articles NOT from the workspace's domain
+      const isFromDomain = link.includes(workspace.baseUrl.replace("https://www.", ""));
+      if (!isFromDomain && workspace.id !== "george-herald") {
         const textToCheck = (articleData.title + " " + (articleData.ogDescription || "") + " " + (articleData.bodyTextPlain || "")).toLowerCase();
         const hasLocalKeyword = workspace.keywords.some(kw => textToCheck.includes(kw));
-        // Also check if the URL is from the workspace's domain
-        const isFromDomain = link.includes(workspace.baseUrl.replace("https://www.", ""));
-        if (!hasLocalKeyword && !isFromDomain) {
-          // This could be a shared GH article appearing on local site - skip
+        if (!hasLocalKeyword) {
           wsSkipped++;
           continue;
         }
