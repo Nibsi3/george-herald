@@ -177,6 +177,7 @@ export async function PUT(req: NextRequest) {
   const listingFields = [
     "title", "description", "section", "category", "isTopStory",
     "featuredImage", "author", "tags", "hasVideo", "hasGallery", "updated", "workspace",
+    "status", "scheduledPublishDate",
   ];
   for (const field of listingFields) {
     if (updates[field] !== undefined) {
@@ -237,6 +238,10 @@ export async function POST(req: NextRequest) {
   // Non-GH workspace articles are automatically top stories for that workspace
   const autoTopStory = ws !== PARENT_WORKSPACE ? true : (isTopStory || false);
 
+  // Handle status and scheduling
+  const status = body.status || "published";
+  const scheduledPublishDate = body.scheduledPublishDate || "";
+
   const newListing = {
     guid: String(maxGuid + 1),
     link: `https://www.georgeherald.com/${section}/${slug}`,
@@ -255,6 +260,8 @@ export async function POST(req: NextRequest) {
     imageCount: 0,
     workspace: ws,
     createdBy: session.email,
+    status,
+    scheduledPublishDate,
   };
 
   articles.unshift(newListing);

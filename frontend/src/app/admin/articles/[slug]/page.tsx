@@ -31,6 +31,9 @@ import {
   Pilcrow,
   Camera,
   Plus,
+  Clock,
+  Calendar,
+  Send,
 } from "lucide-react";
 
 const SECTIONS = [
@@ -86,6 +89,8 @@ interface ArticleData {
   link?: string;
   ogImage?: string;
   workspace?: string;
+  status?: "draft" | "published" | "scheduled";
+  scheduledPublishDate?: string;
 }
 
 const EMPTY_ARTICLE: ArticleData = {
@@ -104,6 +109,8 @@ const EMPTY_ARTICLE: ArticleData = {
   updated: new Date().toISOString(),
   hasVideo: false,
   hasGallery: false,
+  status: "draft",
+  scheduledPublishDate: "",
 };
 
 export default function ArticleEditorPage() {
@@ -130,6 +137,9 @@ export default function ArticleEditorPage() {
   const [galleryViewIdx, setGalleryViewIdx] = useState(0);
   const [blockInsertOpen, setBlockInsertOpen] = useState(false);
   const [currentUserName, setCurrentUserName] = useState("");
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState("");
+  const [scheduleTime, setScheduleTime] = useState("09:00");
 
   // Fetch current user to auto-populate author
   useEffect(() => {
@@ -229,25 +239,63 @@ export default function ArticleEditorPage() {
     }
   }, []);
 
-  async function handleSave() {
-    // Sync body before saving
+  function getArticlePayload(status: "draft" | "published" | "scheduled", scheduledDate?: string) {
     if (bodyRef.current) {
       article.bodyText = bodyRef.current.innerHTML;
     }
+    const wsId = getWorkspaceId();
+    const payload: Record<string, unknown> = {
+      ...article,
+      workspace: article.workspace || wsId,
+      status,
+      scheduledPublishDate: scheduledDate || "",
+    };
+    // Non-GH workspace articles are auto top stories
+    if (wsId !== "george-herald" && isNew) {
+      payload.isTopStory = true;
+    }
+    return payload;
+  }
+
+  async function handleSaveDraft() {
     setSaving(true);
     setSaved(false);
     try {
-      // Auto-set workspace
-      const wsId = getWorkspaceId();
-      const payload = {
-        ...article,
-        workspace: article.workspace || wsId,
-      };
-      // Non-GH workspace articles are auto top stories
-      if (wsId !== "george-herald" && isNew) {
-        payload.isTopStory = true;
+      const payload = getArticlePayload("draft");
+      if (isNew) {
+        const res = await fetch("/api/admin/articles", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (res.ok && data.article?.slug) {
+          toast("Draft saved!");
+          router.push("/admin/articles");
+        }
+      } else {
+        await fetch("/api/admin/articles", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug, ...payload }),
+        });
+        setSaved(true);
+        toast("Draft saved");
+        setTimeout(() => setSaved(false), 3000);
       }
+    } catch (err) {
+      console.error("Save failed:", err);
+      toast("Save failed");
+    } finally {
+      setSaving(false);
+    }
+  }
 
+  async function handlePublishNow() {
+    setSaving(true);
+    setPublishModalOpen(false);
+    try {
+      const payload = getArticlePayload("published");
       if (isNew) {
         const res = await fetch("/api/admin/articles", {
           method: "POST",
@@ -265,16 +313,68 @@ export default function ArticleEditorPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ slug, ...payload }),
         });
-        setSaved(true);
-        toast("Article saved");
-        setTimeout(() => setSaved(false), 3000);
+        setArticle((prev) => ({ ...prev, status: "published", scheduledPublishDate: "" }));
+        toast("Article published!");
       }
     } catch (err) {
-      console.error("Save failed:", err);
-      toast("Save failed");
+      console.error("Publish failed:", err);
+      toast("Publish failed");
     } finally {
       setSaving(false);
     }
+  }
+
+  async function handleSchedule() {
+    if (!scheduleDate) {
+      toast("Please select a date");
+      return;
+    }
+    const scheduledDateTime = `${scheduleDate}T${scheduleTime}:00`;
+    const scheduledDateObj = new Date(scheduledDateTime);
+    if (scheduledDateObj <= new Date()) {
+      toast("Scheduled time must be in the future");
+      return;
+    }
+
+    setSaving(true);
+    setPublishModalOpen(false);
+    try {
+      const payload = getArticlePayload("scheduled", scheduledDateObj.toISOString());
+      if (isNew) {
+        const res = await fetch("/api/admin/articles", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (res.ok && data.article?.slug) {
+          toast(`Scheduled for ${scheduledDateObj.toLocaleString()}`);
+          router.push("/admin/articles");
+        }
+      } else {
+        await fetch("/api/admin/articles", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug, ...payload }),
+        });
+        setArticle((prev) => ({ ...prev, status: "scheduled", scheduledPublishDate: scheduledDateObj.toISOString() }));
+        toast(`Scheduled for ${scheduledDateObj.toLocaleString()}`);
+      }
+    } catch (err) {
+      console.error("Schedule failed:", err);
+      toast("Schedule failed");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function openPublishModal() {
+    // Set default schedule date to tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setScheduleDate(tomorrow.toISOString().split("T")[0]);
+    setScheduleTime("09:00");
+    setPublishModalOpen(true);
   }
 
   async function handleDelete() {
@@ -509,16 +609,128 @@ export default function ArticleEditorPage() {
               <Trash2 className="h-4 w-4" />
             </button>
           )}
+          {/* Save as Draft button */}
           <button
-            onClick={handleSave}
+            onClick={handleSaveDraft}
+            disabled={saving || !article.title}
+            className="inline-flex items-center gap-2 border border-gray-300 text-gray-700 font-semibold text-sm px-4 py-2.5 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            <Save className="h-4 w-4" />
+            {saving ? "Saving..." : "Save Draft"}
+          </button>
+
+          {/* Publish button - opens modal */}
+          <button
+            onClick={openPublishModal}
             disabled={saving || !article.title}
             className="inline-flex items-center gap-2 bg-[#DC2626] text-white font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-[#B91C1C] transition-colors disabled:opacity-50"
           >
-            <Save className="h-4 w-4" />
-            {saving ? "Saving..." : saved ? "Saved!" : isNew ? "Publish" : "Save"}
+            <Send className="h-4 w-4" />
+            {article.status === "scheduled" ? "Scheduled" : article.status === "published" ? "Published" : "Publish"}
           </button>
         </div>
       </div>
+
+      {/* Publish Modal */}
+      {publishModalOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setPublishModalOpen(false)}>
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-gray-900">Publish Article</h2>
+              <p className="text-sm text-gray-500 mt-0.5">Choose when to publish this article</p>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+              {/* Current status indicator */}
+              {article.status === "scheduled" && article.scheduledPublishDate && (
+                <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <Clock className="h-4 w-4 text-amber-600" />
+                  <span className="text-sm text-amber-800">
+                    Currently scheduled for {new Date(article.scheduledPublishDate).toLocaleString()}
+                  </span>
+                </div>
+              )}
+              {article.status === "published" && (
+                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <span className="text-sm text-green-800">This article is already published</span>
+                </div>
+              )}
+
+              {/* Publish Now Option */}
+              <button
+                onClick={handlePublishNow}
+                disabled={saving}
+                className="w-full flex items-center gap-4 p-4 border-2 border-gray-200 rounded-xl hover:border-[#DC2626] hover:bg-red-50/30 transition-colors text-left group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-[#DC2626] flex items-center justify-center shrink-0">
+                  <Send className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900 group-hover:text-[#DC2626] transition-colors">Publish Now</p>
+                  <p className="text-sm text-gray-500">Make this article live immediately</p>
+                </div>
+              </button>
+
+              {/* Schedule Option */}
+              <div className="border-2 border-gray-200 rounded-xl p-4 space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-900">Schedule for Later</p>
+                    <p className="text-sm text-gray-500">Set a specific date and time</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5">Date</label>
+                    <input
+                      type="date"
+                      value={scheduleDate}
+                      onChange={(e) => setScheduleDate(e.target.value)}
+                      min={new Date().toISOString().split("T")[0]}
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#DC2626] focus:border-[#DC2626] outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 mb-1.5">Time</label>
+                    <input
+                      type="time"
+                      value={scheduleTime}
+                      onChange={(e) => setScheduleTime(e.target.value)}
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#DC2626] focus:border-[#DC2626] outline-none"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleSchedule}
+                  disabled={saving || !scheduleDate}
+                  className="w-full inline-flex items-center justify-center gap-2 bg-blue-600 text-white font-semibold text-sm px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                >
+                  <Clock className="h-4 w-4" />
+                  Schedule Publication
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+              <button
+                onClick={() => setPublishModalOpen(false)}
+                className="w-full text-sm text-gray-500 hover:text-gray-700 font-medium py-2"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ─── WYSIWYG Article View: The preview IS the editor ─── */}
       <div className="max-w-3xl mx-auto">

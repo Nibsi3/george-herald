@@ -25,6 +25,7 @@ import {
   Camera,
   ChevronDown,
   FileText,
+  Clock,
 } from "lucide-react";
 
 interface ArticleListing {
@@ -44,6 +45,8 @@ interface ArticleListing {
   viewCount?: number;
   workspace?: string;
   createdBy?: string;
+  status?: "draft" | "published" | "scheduled";
+  scheduledPublishDate?: string;
 }
 
 const SECTIONS = [
@@ -485,10 +488,24 @@ export default function AdminArticlesPage() {
                   </span>
                 </div>
 
-                {/* Views */}
+                {/* Views + Status */}
                 <div className="flex items-center gap-1">
-                  <Eye className="h-3 w-3 text-gray-300" />
-                  <span className="text-[11px] text-gray-500 tabular-nums">{(article.viewCount || 0).toLocaleString()}</span>
+                  {/* Status badge */}
+                  {article.status === "draft" && (
+                    <span className="text-[9px] font-bold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded" title="Draft">Draft</span>
+                  )}
+                  {article.status === "scheduled" && (
+                    <span className="text-[9px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded flex items-center gap-0.5" title={article.scheduledPublishDate ? `Scheduled for ${new Date(article.scheduledPublishDate).toLocaleString()}` : "Scheduled"}>
+                      <Clock className="h-2.5 w-2.5" />
+                      Scheduled
+                    </span>
+                  )}
+                  {(article.status === "published" || !article.status) && (
+                    <>
+                      <Eye className="h-3 w-3 text-gray-300" />
+                      <span className="text-[11px] text-gray-500 tabular-nums">{(article.viewCount || 0).toLocaleString()}</span>
+                    </>
+                  )}
                   {article.isTopStory && (
                     <Star className="h-3 w-3 text-amber-500 fill-current ml-1" title="Top Story" />
                   )}
