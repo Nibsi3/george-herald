@@ -1,39 +1,43 @@
 # georgeherald
 
-## Overview
-This repository contains active product code and implementation details for the **georgeherald** project.
+Content-heavy local news platform with a Next.js frontend and scraping pipeline used to ingest, normalize, and publish article, gallery, and video feeds.
 
-## Highlights
-- Clean project structure with separated app/data/config concerns.
-- Production-oriented setup with environment-driven configuration.
-- Ready for extension with tests, CI checks, and deployment workflows.
+## What it does
+- Homepage and section pages for breaking news, top stories, business, sport, lifestyle, and community content.
+- Data-driven cards/rotators for top stories, most-read, ticker updates, galleries, and videos.
+- Scraping and feed ingestion utilities to keep the content dataset fresh.
+- Structured routes for article detail pages and topic navigation.
 
-## Tech Stack
-- Node.js
-- TypeScript
-- React
-- Next.js
+## Stack
+- Next.js 16 + React 19
+- Node.js scraping toolchain (`axios`, `cheerio`, `xml2js`, `node-fetch`)
+- Workspace setup with a dedicated `frontend` package
 
-## Run Locally
-1. Clone the repository and move into the project folder.
-2. Install dependencies (`npm install`, `pnpm install`, or the package manager used by the project).
-3. Create a local `.env` file if environment variables are required.
-4. Start the development server and verify the main flow works end-to-end.
+## Local development
+```bash
+npm install
+npm run dev
+```
 
-## Repository Layout
-- `backend/`
-- `frontend/`
-- `public/`
-- `scraped-data/`
-- `scraper/`
+Main scripts:
+```bash
+npm run build
+npm run start
+```
+
+## Repository structure
+- `frontend/` production web app
+- `backend/` supporting assets/utilities
+- `scraper/` scraping logic and extraction tooling
+- `scraped-data/` normalized content snapshots
+- `public/` static assets
 
 ## Demo
 ![favicon](backend/favicon.png)
-
 ![georgeherald_favicon](frontend/public/georgeherald_favicon.png)
 
-## Security Notes
-- Keep credentials in environment variables, never in tracked files.
-- Rotate and replace any key immediately if exposure is suspected.
-- Use least-privilege tokens for third-party integrations.
+## Practical next improvements
+- Add scheduled scraper jobs with health-check reporting.
+- Add freshness checks to detect stale categories before deploy.
+- Add integration tests around article parsing edge cases.
 
