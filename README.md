@@ -28,11 +28,12 @@ This repository contains active product code and implementation details for the 
 - `scraper/`
 
 ## Demo
-![favicon](backend\favicon.png)
+![favicon](backend/favicon.png)
 
-![georgeherald_favicon](frontend\public\georgeherald_favicon.png)
+![georgeherald_favicon](frontend/public/georgeherald_favicon.png)
 
 ## Security Notes
 - Keep credentials in environment variables, never in tracked files.
 - Rotate and replace any key immediately if exposure is suspected.
 - Use least-privilege tokens for third-party integrations.
+
